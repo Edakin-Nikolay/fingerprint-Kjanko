@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from enhance import image_enhance
 from skimage.morphology import skeletonize
 import functools
+from compare_result import Compare_result
 
 
 def removedot(invertThin):
@@ -99,24 +100,52 @@ def compare(probe, standard, threshold, need_plot=False):
     for match in matches:
         score += match.distance
     result = score/len(matches) < threshold
-    user_match = probe.user_id == standard.user_id & probe.finger_id == standard.finger_id
+    user_match = probe.user_id == standard.user_id and probe.finger_id == standard.finger_id
 
-    print("compare ", probe.user_id, " with ", standard.user_id)
+    print("user_ids", probe.user_id, standard.user_id, "finger_ids", probe.finger_id, standard.finger_id)
     if result:
         if user_match:
-            return lambda cr: cr.true_positive + 1
+            return lambda cr: Compare_result(
+                true_positive=cr.true_positive + 1,
+                false_positive=cr.false_positive,
+                true_negative=cr.true_negative,
+                false_negative=cr.false_negative)
         else:
-            return lambda cr: cr.false_positive + 1
+            return lambda cr: Compare_result(
+                true_positive=cr.true_positive,
+                false_positive=cr.false_positive + 1,
+                true_negative=cr.true_negative,
+                false_negative=cr.false_negative)
     else:
         if user_match:
-            return lambda cr: cr.false_negative + 1
+            return lambda cr: Compare_result(
+                true_positive=cr.true_positive,
+                false_positive=cr.false_positive,
+                true_negative=cr.true_negative,
+                false_negative=cr.false_negative + 1)
         else:
-            return lambda cr: cr.true_negative + 1
+            return lambda cr: Compare_result(
+                true_positive=cr.true_positive,
+                false_positive=cr.false_positive,
+                true_negative=cr.true_negative + 1,
+                false_negative=cr.false_negative)
 
 
-def fold_results(list_func):
-    return functools.reduce(lambda acc, f: f(acc), list_func, 0)
+def fold_funcs(list_func):
+    return functools.reduce(lambda acc, f: f(acc), list_func, Compare_result(0, 0, 0, 0))
+
+
+def func_fold(acc, res):
+    return Compare_result(
+        true_positive=acc.true_positive + res.true_positive,
+        false_positive=acc.false_positive + res.false_positive,
+        true_negative=acc.true_negative + res.true_negative,
+        false_negative=acc.false_negative + res.false_negative)
+
+
+def fold_results(list_cr):
+    return functools.reduce(func_fold, list_cr, Compare_result(0, 0, 0, 0))
 
 
 def compare_one_with_n(probe, list_standard, threshold=40):
-    return fold_results(list(map(lambda standard: compare(probe, standard, threshold), list_standard)))
+    return fold_funcs(list(map(lambda standard: compare(probe, standard, threshold), list_standard)))
