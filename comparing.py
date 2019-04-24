@@ -2,9 +2,10 @@ import cv2
 import numpy
 import matplotlib.pyplot as plt
 from enhance import image_enhance
-from skimage.morphology import skeletonize
+# from skimage.morphology import skeletonize
 import functools
 from compare_result import Compare_result
+import time
 
 
 def removedot(invertThin):
@@ -41,17 +42,19 @@ def removedot(invertThin):
 def get_descriptors(img):
     clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
     img = clahe.apply(img)
-    img = image_enhance.image_enhance(img)
+    # start_time = time.time()
+    img = image_enhance.crop_image(img, 350)
     img = numpy.array(img, dtype=numpy.uint8)
+    # print("{} time apply enchance".format(time.time() - start_time))
     # Threshold
     ret, img = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU);
     # Normalize to 0 and 1 range
     img[img == 255] = 1
 
     #Thinning
-    skeleton = skeletonize(img)
-    skeleton = numpy.array(skeleton, dtype=numpy.uint8)
-    skeleton = removedot(skeleton)
+    # skeleton = skeletonize(img)
+    # skeleton = numpy.array(skeleton, dtype=numpy.uint8)
+    # skeleton = removedot(skeleton)
     # Harris corners
     harris_corners = cv2.cornerHarris(img, 3, 3, 0.04)
     harris_normalized = cv2.normalize(harris_corners, 0, 255, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32FC1)
@@ -73,7 +76,6 @@ def compare(probe, standard, threshold, need_plot=False):
     # image_name = sys.argv[1]
     probe_image = probe.image
     kp1, des1 = get_descriptors(probe_image)
-
     # image_name = sys.argv[2]
     standard_image = standard.image
     kp2, des2 = get_descriptors(standard_image)

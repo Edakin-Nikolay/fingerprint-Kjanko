@@ -4,10 +4,24 @@ Created on Mon Apr 18 22:50:30 2016
 
 @author: utkarsh
 """
+import numpy as np
+import scipy
+import scipy.ndimage
 from enhance.ridge_segment import ridge_segment
 from enhance.ridge_orient import ridge_orient
 from enhance.ridge_freq import ridge_freq
 from enhance.ridge_filter import ridge_filter
+
+
+def crop_image(img, width=300):
+    rows, cols = np.shape(img)
+    aspect_ratio = np.double(rows)/np.double(cols)
+    new_rows = width             # randomly selected number
+    new_cols = new_rows/aspect_ratio
+
+    img = scipy.misc.imresize(img, (np.int(new_rows), np.int(new_cols)))
+    return image_enhance(img)
+
 
 def image_enhance(img):
     blksze = 16;
