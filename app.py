@@ -4,9 +4,8 @@ import cv2
 import create_users
 import comparing
 import time
-
-os.chdir("C:/Institut/programs/")
-# os.chdir("/home/nikolay/learning/fingerprint-Kjanko")
+# os.chdir("C:/Institut/programs/")
+os.chdir("/home/nikolay/learning/")
 
 
 def main():
