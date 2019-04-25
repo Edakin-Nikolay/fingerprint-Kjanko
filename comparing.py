@@ -74,11 +74,9 @@ def get_descriptors(img):
 
 def compare(probe, standard, threshold, need_plot=False):
     # image_name = sys.argv[1]
-    probe_image = probe.image
-    kp1, des1 = get_descriptors(probe_image)
+    kp1, des1 = probe.image  # get_descriptors(probe_image)
     # image_name = sys.argv[2]
-    standard_image = standard.image
-    kp2, des2 = get_descriptors(standard_image)
+    kp2, des2 = standard.image  # get_descriptors(standard_image)
 
     # Matching between descriptors
     bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
@@ -86,14 +84,14 @@ def compare(probe, standard, threshold, need_plot=False):
 
     if need_plot:
         # Plot keypoints
-        img4 = cv2.drawKeypoints(probe_image, kp1, outImage=None)
-        img5 = cv2.drawKeypoints(standard_image, kp2, outImage=None)
+        img4 = cv2.drawKeypoints(probe.image, kp1, outImage=None)
+        img5 = cv2.drawKeypoints(standard.image, kp2, outImage=None)
         f, axarr = plt.subplots(1, 2)
         axarr[0].imshow(img4)
         axarr[1].imshow(img5)
         plt.show()
         # Plot matches
-        img3 = cv2.drawMatches(probe_image, kp1, standard_image, kp2, matches, flags=2, outImg=None)
+        img3 = cv2.drawMatches(probe.image, kp1, standard.image, kp2, matches, flags=2, outImg=None)
         plt.imshow(img3)
         plt.show()
 

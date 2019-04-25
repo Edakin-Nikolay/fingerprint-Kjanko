@@ -4,18 +4,19 @@ import cv2
 import create_users
 import comparing
 import time
-# os.chdir("C:/Institut/programs/")
-os.chdir("/home/nikolay/learning/")
+os.chdir("C:/Institut/programs/")
+# os.chdir("/home/nikolay/learning/")
 
 
 def main():
-    print("run comparing 40-55...")
-    list_probe = create_users.make("fingers/probe/crossMatchDB_55")
-    print("created list of probe...")
+    print("run comparing...")
+    start_time = time.time()
+    list_probe = create_users.make("fingers/probe/crossMatchDB")
+    print("created list of probe on {} sec...".format(time.time() - start_time))
+    start_time = time.time()
     list_standard = create_users.make("fingers/standard/crossMatchDB")
-    print("created list of standard...")
+    print("created list of standard on {} sec...".format(time.time() - start_time))
 
-    # start_time = time.time()
     list_results = list(map(lambda probe: comparing.compare_one_with_n(probe, list_standard), list_probe))
     print(comparing.fold_results(list_results).to_string())
     # users = create_users.make("fingers/probe/crossMatchDB_mini")
