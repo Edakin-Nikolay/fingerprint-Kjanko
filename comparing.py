@@ -102,7 +102,6 @@ def compare(probe, standard, threshold, need_plot=False):
     result = score/len(matches) < threshold
     user_match = probe.user_id == standard.user_id and probe.finger_id == standard.finger_id
 
-    print("user_ids", probe.user_id, standard.user_id, "finger_ids", probe.finger_id, standard.finger_id)
     if result:
         if user_match:
             return lambda cr: Compare_result(
